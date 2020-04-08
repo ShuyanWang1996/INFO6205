@@ -15,7 +15,7 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
      */
     @Override
     public void putAll(Map<Key, Value> map) {
-        @SuppressWarnings("unchecked") List<Key> ks = new ArrayList(map.keySet());
+        List<Key> ks = new ArrayList<>(map.keySet());
         Collections.shuffle(ks);
         for (Key k : ks) put(k, map.get(k));
     }
@@ -57,8 +57,18 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
         return null;
     }
 
+    /**
+     * Method to yield the depth of a key, relative to the root.
+     *
+     * @param key the key whose depth we are interested in.
+     * @return the depth of the key (root: 0) otherwise -1 if key is not found.
+     */
     public int depth(Key key) {
-        return depth(getNode(root, key));
+        try {
+            return depth(root, key);
+        } catch (DepthException e) {
+            return -1;
+        }
     }
 
     public BSTSimple() {
@@ -122,9 +132,119 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
 
     private Node delete(Node x, Key key) {
         // TO BE IMPLEMENTED ...
-        return null;
+        // if x is not the node should be deleted
+        // if node is root
+        if (key.compareTo(x.key) == 0){
+            // 0 kid
+            if (x.smaller == null && x.larger == null){
+                 x.count --;
+                 return null;
+            }
+            // 1 kid
+            else if (x.smaller != null && x.larger == null){
+                root = x.smaller;
+            }
+            else if (x.smaller == null && x.larger != null){
+                root = x.larger;
+            }
+            // 2 kid
+            else if (x.smaller != null && x.larger != null){
+                Node newSmaller = x.larger;
+                while (newSmaller.smaller != null){
+                    newSmaller = newSmaller.smaller;
+                }
+                deleteMin(x.larger);
+                newSmaller.smaller = x.smaller;
+                newSmaller.larger = x.larger;
+                x = newSmaller;
+            }
+            x.count --;
+            return root;
+        }
+        // if node is not root
+        if (key.compareTo(x.key) < 0){
+            // --------------
+//            System.out.println(key+" is smaller than "+x.key);
+            // --------------
+            // cannot find
+
+            if (x.smaller == null) {
+                // --------------
+//                System.out.println("cannot find "+key);
+//                System.out.println("root: "+ root+" , size: "+root.count);
+                // --------------
+                return root;
+            }
+
+            // can find
+            if (key.compareTo(x.smaller.key) == 0){
+                // if x.smaller should be deleted
+                // 0 kid
+                if (x.smaller.smaller == null && x.smaller.larger == null){
+                    x.smaller = null;
+                }
+                // 1 kid
+                else if (x.smaller.smaller != null && x.smaller.larger == null){
+                    x.smaller = x.smaller.smaller;
+                }
+                else if (x.smaller.smaller == null && x.smaller.larger != null){
+                    x.smaller = x.smaller.larger;
+                }
+                // 2 kid
+                else if (x.smaller.smaller != null && x.smaller.larger != null){
+                    Node newSmaller = x.smaller.larger;
+                    while (newSmaller.smaller != null){
+                        newSmaller = newSmaller.smaller;
+                    }
+                    deleteMin(x.smaller.larger);
+                    newSmaller.smaller = x.smaller.smaller;
+                    newSmaller.larger = x.smaller.larger;
+                    x.smaller = newSmaller;
+                }
+                x.count --;
+                return root;
+            }else{
+                delete(x.smaller,key);
+            }
+        }
+        if (key.compareTo(x.key) > 0){
+            // cannot find
+            if (x.larger == null) return root;
+            // can find
+            if (key.compareTo(x.larger.key) == 0){
+                // if x.larger should be deleted
+                // 0 kid
+                if (x.larger.smaller == null && x.larger.larger == null){
+                    x.larger = null;
+                }
+                // 1 kid
+                else if (x.larger.smaller != null && x.larger.larger == null){
+                    x.larger = x.larger.smaller;
+                }
+                else if (x.larger.smaller == null && x.larger.larger != null){
+                    x.larger = x.larger.larger;
+                }
+                // 2 kid
+                else if (x.larger.smaller != null && x.larger.larger != null){
+                    Node newSmaller = x.larger.larger;
+                    while (newSmaller.smaller != null){
+                        newSmaller = newSmaller.smaller;
+                    }
+                    deleteMin(x.larger.larger);
+                    newSmaller.smaller = x.larger.smaller;
+                    newSmaller.larger = x.larger.larger;
+                    x.larger = newSmaller;
+                }
+                x.count --;
+                return root;
+            }else{
+                delete(x.smaller,key);
+            }
+        }
+        return root;
         // ... END IMPLEMENTATION
     }
+
 
     private Node deleteMin(Node x) {
         if (x.smaller == null) return x.larger;
@@ -149,17 +269,29 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
      * @param node the node
      * @param f the function to be invoked
      */
-    private void doTraverse(int q, Node node, BiFunction<Key, Value, Void> f) {
+    public void doTraverse(int q, Node node, BiFunction<Key, Value, Void> f) {
         if (node == null) return;
-        if (q<0) f.apply(node.key, node.value);
+        if (q < 0) f.apply(node.key, node.value);
         doTraverse(q, node.smaller, f);
-        if (q==0) f.apply(node.key, node.value);
+        if (q == 0) f.apply(node.key, node.value);
         doTraverse(q, node.larger, f);
-        if (q>0) f.apply(node.key, node.value);
+        if (q > 0) f.apply(node.key, node.value);
     }
 
-    private int depth(Node key) {
-        return 0;
+    /**
+     * Yield the total depth of this BST. If root is null, then depth will be 0.
+     *
+     * @return the total number of levels in this BST.
+     */
+    public int depth() {
+        return depth(root);
+    }
+
+    private int depth(Node node) {
+        if (node == null) return 0;
+        int depthS = depth(node.smaller);
+        int depthL = depth(node.larger);
+        return 1 + Math.max(depthL, depthS);
     }
 
     private class NodeValue {
@@ -194,8 +326,8 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder("Node: " + key + ":" + value);
-            if (smaller != null) sb.append(", smaller: " + smaller.key);
-            if (larger != null) sb.append(", larger: " + larger.key);
+            if (smaller != null) sb.append(", smaller: ").append(smaller.key);
+            if (larger != null) sb.append(", larger: ").append(larger.key);
             return sb.toString();
         }
 
@@ -240,5 +372,18 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
         StringBuffer sb = new StringBuffer();
         show(root, sb, 0);
         return sb.toString();
+    }
+
+    private int depth(Node node, Key key) throws DepthException {
+        if (node == null) throw new DepthException();
+        int cf = key.compareTo(node.key);
+        if (cf < 0) return 1 + depth(node.smaller, key);
+        else if (cf > 0) return 1 + depth(node.larger, key);
+        else return 0;
+    }
+
+    private static class DepthException extends Exception {
+        public DepthException() {
+        }
     }
 }

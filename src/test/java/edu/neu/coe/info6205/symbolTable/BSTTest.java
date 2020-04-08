@@ -13,9 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("ALL")
 public class BSTTest {
@@ -132,7 +130,7 @@ public class BSTTest {
         bst.put("X", 99);
         bst.put("Z", 37);
         Queue<String> queue = new Queue_Elements<String>();
-        bst.inOrderTraverse((w, x) -> { queue.enqueue(w); return null; });
+        bst.inOrderTraverse((w, x) -> { queue.enqueue(w);  return null; });
         assertEquals("X",queue.dequeue());
         assertEquals("Y",queue.dequeue());
         assertEquals("Z",queue.dequeue());
@@ -188,6 +186,10 @@ public class BSTTest {
         tester.invokePrivate("setRoot", node);
         bst.put("W",57);
         bst.delete("A");
+        // --------------
+//        System.out.println(bst.root);
+//        System.out.println(bst.size());
+        // --------------
         assertEquals(2, bst.size());
     }
 
@@ -202,7 +204,58 @@ public class BSTTest {
     public void testSize2() {
         Random random = new Random(0L);
         BSTSimple<String, Integer> bst = new BSTSimple<>();
-        for (int i=0; i<100; i++) bst.put(Integer.toString(random.nextInt(200)), i);
+        for (int i = 0; i < 100; i++) bst.put(Integer.toString(random.nextInt(200)), i);
         assertEquals(79, bst.size());
+    }
+
+    @Test
+    public void testDepthKey1() throws Exception {
+        BSTSimple<String, Integer> bst = new BSTSimple<>();
+        PrivateMethodTester tester = new PrivateMethodTester(bst);
+        Class[] classes = {Comparable.class, Object.class, int.class};
+        BSTSimple.Node nodeX = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "X", 42, 0);
+        BSTSimple.Node nodeY = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "Y", 52, 0);
+        BSTSimple.Node nodeZ = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "Z", 99, 0);
+        nodeY.smaller = nodeX;
+        nodeY.larger = nodeZ;
+        tester.invokePrivate("setRoot", nodeY);
+        assertEquals(1, bst.depth("X"));
+        assertEquals(0, bst.depth("Y"));
+        assertEquals(1, bst.depth("Z"));
+        assertEquals(-1, bst.depth("A"));
+    }
+
+    @Test
+    public void testDepthKey2() throws Exception {
+        BSTSimple<String, Integer> bst = new BSTSimple<>();
+        bst.put("Hello", 3);
+        bst.put("Goodbye", 5);
+        bst.put("Ciao", 8);
+        assertEquals(0, bst.depth("Hello"));
+        assertEquals(1, bst.depth("Goodbye"));
+        assertEquals(2, bst.depth("Ciao"));
+    }
+
+    @Test
+    public void testDepth1() throws Exception {
+        BSTSimple<String, Integer> bst = new BSTSimple<>();
+        PrivateMethodTester tester = new PrivateMethodTester(bst);
+        Class[] classes = {Comparable.class, Object.class, int.class};
+        BSTSimple.Node nodeX = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "X", 42, 0);
+        BSTSimple.Node nodeY = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "Y", 52, 0);
+        BSTSimple.Node nodeZ = (BSTSimple.Node) tester.invokePrivateExplicit("makeNode", classes, "Z", 99, 0);
+        nodeY.smaller = nodeX;
+        nodeY.larger = nodeZ;
+        tester.invokePrivate("setRoot", nodeY);
+        assertEquals(2, bst.depth());
+    }
+
+    @Test
+    public void testDepth2() throws Exception {
+        BSTSimple<String, Integer> bst = new BSTSimple<>();
+        bst.put("Hello", 3);
+        bst.put("Goodbye", 5);
+        bst.put("Ciao", 8);
+        assertEquals(3, bst.depth());
     }
 }
