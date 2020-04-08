@@ -238,13 +238,12 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BSTdetail<
                 x.count --;
                 return root;
             }else{
-                delete(x.smaller,key);
+                delete(x.larger,key);
             }
         }
         return root;
         // ... END IMPLEMENTATION
     }
-
 
     private Node deleteMin(Node x) {
         if (x.smaller == null) return x.larger;
