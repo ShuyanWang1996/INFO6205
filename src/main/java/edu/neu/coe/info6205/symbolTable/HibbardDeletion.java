@@ -9,7 +9,7 @@ public class HibbardDeletion {
         Random random = new Random();
         BSTSimple<Integer,Integer> bstSimple = new BSTSimple<>();
 //         N: size of nodes
-        int N = 50;
+        int N = 40;
         // M: times of insertion and deletion
         hibbardDeletion.test(N,50,random);
         hibbardDeletion.test(N,55,random);
@@ -42,7 +42,7 @@ public class HibbardDeletion {
         System.out.println("N = "+N+", M = "+M);
         System.out.println("Size of BST = "+bstSimple.size());
         System.out.println("Depth of BST = "+bstSimple.depth());
-        double proportion = bstSimple.depth()/Math.sqrt((double) bstSimple.depth());
+        double proportion = bstSimple.depth()/Math.sqrt((double) bstSimple.size());
 //        System.out.println(proportion);
         System.out.println("Depth is "+proportion+" proportional to Square of Size");
         System.out.println("-------------------------------------");
