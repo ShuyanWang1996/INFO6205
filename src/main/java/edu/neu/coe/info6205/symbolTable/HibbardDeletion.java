@@ -8,7 +8,7 @@ public class HibbardDeletion {
         HibbardDeletion hibbardDeletion = new HibbardDeletion();
         Random random = new Random();
         BSTSimple<Integer,Integer> bstSimple = new BSTSimple<>();
-        // N: size of nodes
+//         N: size of nodes
         int N = 50;
         // M: times of insertion and deletion
         hibbardDeletion.test(N,50,random);
